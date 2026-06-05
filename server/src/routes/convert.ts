@@ -17,7 +17,7 @@ router.post('/convert', async (req, res) => {
     } = req.body as ConvertRequest;
 
     if (!apiKey || !baseURL || !model || !chapterText) {
-      res.status(400).json({ error: '缺少必要参数' });
+      res.status(400).json({ error: '缺少必要参数（apiKey、baseURL、model、chapterText）' });
       return;
     }
 
@@ -29,6 +29,24 @@ router.post('/convert', async (req, res) => {
     res.json(result);
   } catch (err: any) {
     console.error('转换失败:', err);
+
+    if (err?.status === 401) {
+      res.status(401).json({ error: 'API Key 无效或已过期' });
+      return;
+    }
+    if (err?.status === 429) {
+      res.status(429).json({ error: '请求过于频繁，请稍后重试' });
+      return;
+    }
+    if (err?.code === 'ECONNREFUSED' || err?.code === 'ENOTFOUND') {
+      res.status(502).json({ error: '无法连接到 AI 服务，请检查 Base URL' });
+      return;
+    }
+    if (err?.code === 'ETIMEDOUT' || err?.message?.includes('timeout')) {
+      res.status(504).json({ error: '请求超时，请稍后重试' });
+      return;
+    }
+
     const message = err?.message || '转换过程中发生未知错误';
     res.status(500).json({ error: message });
   }

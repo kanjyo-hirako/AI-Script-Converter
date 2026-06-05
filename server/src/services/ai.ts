@@ -19,5 +19,15 @@ export async function convertChapter(
     temperature: 0.3,
     response_format: { type: 'json_object' },
   });
-  return JSON.parse(response.choices[0].message.content ?? '{}');
+
+  const content = response.choices[0].message.content;
+  if (!content) {
+    throw new Error('模型返回了空内容');
+  }
+
+  try {
+    return JSON.parse(content);
+  } catch {
+    throw new Error(`模型返回的内容不是有效 JSON: ${content.slice(0, 200)}`);
+  }
 }

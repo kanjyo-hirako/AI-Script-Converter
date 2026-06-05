@@ -14,7 +14,10 @@ function loadSettings(): Settings {
   const saved = localStorage.getItem(STORAGE_KEY)
   if (saved) {
     try {
-      return JSON.parse(saved)
+      const parsed = JSON.parse(saved)
+      if (MODEL_PROVIDERS[parsed.providerKey]) {
+        return parsed
+      }
     } catch {
       // ignore
     }

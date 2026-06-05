@@ -9,7 +9,7 @@ const providerOptions = Object.entries(MODEL_PROVIDERS).map(([key, p]) => ({
   label: p.name,
 }))
 
-const currentProvider = () => MODEL_PROVIDERS[settings.providerKey]
+const currentProvider = () => MODEL_PROVIDERS[settings.providerKey] ?? MODEL_PROVIDERS.siliconflow
 const isCustom = () => settings.providerKey === 'custom'
 </script>
 

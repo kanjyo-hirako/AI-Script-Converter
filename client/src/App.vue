@@ -1,7 +1,19 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import SettingsPanel from './components/SettingsPanel.vue'
+import NovelInput from './components/NovelInput.vue'
+import ChapterSplitter from './components/ChapterSplitter.vue'
 
 const currentStep = ref<'settings' | 'input' | 'split' | 'convert' | 'edit'>('settings')
+const novelText = ref('')
+
+const steps = [
+  { key: 'settings', label: '设置' },
+  { key: 'input', label: '输入' },
+  { key: 'split', label: '分章' },
+  { key: 'convert', label: '生成' },
+  { key: 'edit', label: '编辑' },
+] as const
 </script>
 
 <template>
@@ -14,13 +26,7 @@ const currentStep = ref<'settings' | 'input' | 'split' | 'convert' | 'edit'>('se
     <main class="max-w-7xl mx-auto px-6 py-8">
       <div class="flex gap-2 mb-8">
         <button
-          v-for="step in [
-            { key: 'settings', label: '设置' },
-            { key: 'input', label: '输入' },
-            { key: 'split', label: '分章' },
-            { key: 'convert', label: '生成' },
-            { key: 'edit', label: '编辑' },
-          ]"
+          v-for="step in steps"
           :key="step.key"
           :class="[
             'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
@@ -28,14 +34,19 @@ const currentStep = ref<'settings' | 'input' | 'split' | 'convert' | 'edit'>('se
               ? 'bg-indigo-600 text-white'
               : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-100',
           ]"
-          @click="currentStep = step.key as typeof currentStep"
+          @click="currentStep = step.key"
         >
           {{ step.label }}
         </button>
       </div>
 
       <div class="bg-white rounded-xl border border-gray-200 p-6">
-        <p class="text-gray-500">项目已初始化，请开始构建各组件。</p>
+        <SettingsPanel v-if="currentStep === 'settings'" />
+        <NovelInput v-else-if="currentStep === 'input'" @update:text="novelText = $event" />
+        <ChapterSplitter v-else-if="currentStep === 'split'" :text="novelText" />
+        <div v-else class="text-gray-500">
+          <p>「{{ steps.find(s => s.key === currentStep)?.label }}」步骤待实现</p>
+        </div>
       </div>
     </main>
   </div>

@@ -1,6 +1,16 @@
 import type { ModelProvider } from './types';
 
 export const MODEL_PROVIDERS: Record<string, ModelProvider> = {
+  siliconflow: {
+    name: 'SiliconFlow',
+    baseURL: 'https://api.siliconflow.cn/v1',
+    models: [
+      'deepseek-ai/DeepSeek-V4-Flash',
+      'deepseek-ai/DeepSeek-V3',
+      'Qwen/Qwen2.5-72B-Instruct',
+    ],
+    defaultModel: 'deepseek-ai/DeepSeek-V4-Flash',
+  },
   deepseek: {
     name: 'DeepSeek',
     baseURL: 'https://api.deepseek.com',

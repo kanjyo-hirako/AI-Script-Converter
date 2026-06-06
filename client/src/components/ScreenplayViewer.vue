@@ -1,13 +1,37 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import YamlEditor from './YamlEditor.vue'
+import CharacterPanel from './CharacterPanel.vue'
+import SceneNavigator from './SceneNavigator.vue'
+import type { Character, Scene } from '../../../shared/types'
 
 const props = defineProps<{
   yamlContent: string
   status: 'idle' | 'converting' | 'done' | 'error'
+  characters: Character[]
+  scenes: Scene[]
 }>()
 
 const readOnly = computed(() => props.status === 'converting')
+const editorRef = ref<InstanceType<typeof YamlEditor>>()
+
+function findLineById(id: string): number {
+  const lines = props.yamlContent.split('\n')
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].includes(`id: ${id}`) || lines[i].includes(`id: "${id}"`)) {
+      return i + 1
+    }
+  }
+  return 1
+}
+
+function handleJumpToCharacter(id: string) {
+  editorRef.value?.goToLine(findLineById(id))
+}
+
+function handleJumpToScene(id: string) {
+  editorRef.value?.goToLine(findLineById(id))
+}
 
 function handleExport() {
   const blob = new Blob([props.yamlContent], { type: 'text/yaml;charset=utf-8' })
@@ -45,8 +69,31 @@ function handleExport() {
           导出 .yaml
         </button>
       </div>
-      <div class="flex-1 border border-gray-200 rounded-lg overflow-hidden">
-        <YamlEditor :model-value="yamlContent" :read-only="readOnly" />
+      <div class="flex-1 flex gap-3 min-h-0">
+        <!-- 左侧：角色面板 -->
+        <aside class="w-56 shrink-0 border border-gray-200 rounded-lg overflow-y-auto">
+          <div class="px-3 py-2 border-b border-gray-100">
+            <h3 class="text-sm font-semibold text-gray-700">角色 ({{ characters.length }})</h3>
+          </div>
+          <div class="p-1">
+            <CharacterPanel :characters="characters" @jump-to-character="handleJumpToCharacter" />
+          </div>
+        </aside>
+
+        <!-- 中间：YAML 编辑器 -->
+        <div class="flex-1 border border-gray-200 rounded-lg overflow-hidden min-w-0">
+          <YamlEditor ref="editorRef" :model-value="yamlContent" :read-only="readOnly" />
+        </div>
+
+        <!-- 右侧：场景导航 -->
+        <aside class="w-60 shrink-0 border border-gray-200 rounded-lg overflow-y-auto">
+          <div class="px-3 py-2 border-b border-gray-100">
+            <h3 class="text-sm font-semibold text-gray-700">场景</h3>
+          </div>
+          <div class="p-1">
+            <SceneNavigator :scenes="scenes" @jump-to-scene="handleJumpToScene" />
+          </div>
+        </aside>
       </div>
     </template>
   </div>

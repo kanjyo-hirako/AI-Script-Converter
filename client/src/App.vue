@@ -8,7 +8,7 @@ import ConvertPanel from './components/ConvertPanel.vue'
 import ScreenplayViewer from './components/ScreenplayViewer.vue'
 import { useConversion } from './composables/useConversion'
 
-const currentStep = ref<'settings' | 'input' | 'split' | 'convert' | 'edit'>('settings')
+const currentStep = ref<'input' | 'split' | 'convert' | 'edit' | 'settings'>('input')
 const novelText = ref('')
 
 const conversion = useConversion()
@@ -28,11 +28,11 @@ const yamlContent = computed(() => {
 })
 
 const steps = [
-  { key: 'settings', label: '设置' },
   { key: 'input', label: '输入' },
   { key: 'split', label: '分章' },
   { key: 'convert', label: '生成' },
   { key: 'edit', label: '编辑' },
+  { key: 'settings', label: '设置' },
 ] as const
 </script>
 
@@ -61,8 +61,7 @@ const steps = [
       </div>
 
       <div class="bg-white rounded-xl border border-gray-200 p-6">
-        <SettingsPanel v-if="currentStep === 'settings'" />
-        <NovelInput v-else-if="currentStep === 'input'" @update:text="novelText = $event" />
+        <NovelInput v-if="currentStep === 'input'" @update:text="novelText = $event" />
         <ChapterSplitter v-else-if="currentStep === 'split'" :text="novelText" />
         <ConvertPanel
           v-else-if="currentStep === 'convert'"
@@ -70,16 +69,19 @@ const steps = [
           :status="conversion.status.value"
           :progress="conversion.progress.value"
           :error-message="conversion.errorMessage.value"
+          :error-code="conversion.errorCode.value"
           @convert="conversion.convert(novelText)"
+          @retry="conversion.retry(novelText)"
           @reset="conversion.reset()"
         />
         <ScreenplayViewer
-          v-else
+          v-else-if="currentStep === 'edit'"
           :yaml-content="yamlContent"
           :status="conversion.status.value"
           :characters="conversion.result.value.characters"
           :scenes="conversion.result.value.scenes"
         />
+        <SettingsPanel v-else />
       </div>
     </main>
   </div>

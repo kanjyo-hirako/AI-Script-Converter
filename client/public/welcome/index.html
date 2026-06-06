@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>AI-Script-Converter</title>
+		<link rel="stylesheet" href="css/style.css" />
+		<style>
+			body,
+			html {
+				padding: 0;
+				margin: 0;
+				font-family: 'Arial Black', 'Microsoft YaHei', sans-serif;
+				display: block;
+				overflow: hidden;
+			}
+
+			.startwaves {
+				position: fixed;
+				display: flex;
+				justify-content: center;
+				height: 120vh;
+				width: 100%;
+				background-color: #469ce5;
+				transform: translateY(-10vh);
+				animation-name: down;
+				animation-duration: 3s;
+				animation-delay: 1s;
+				animation-timing-function: ease-out;
+				z-index: 999;
+			}
+
+			@keyframes down {
+				0% {
+					transform: translateY(-10vh);
+				}
+				100% {
+					transform: translateY(110vh);
+				}
+			}
+
+			.waves {
+				display: block;
+				position: absolute;
+				bottom: 120vh;
+				width: 100%;
+			}
+
+			#hero-bg {
+				width: 100%;
+				height: 100%;
+				position: absolute;
+				background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 40%, #312e81 70%, #1e1b4b 100%);
+			}
+
+			#centertext {
+				position: absolute;
+				left: 50%;
+				top: 50%;
+				transform: translate(-50%, -50%);
+				text-align: center;
+				animation-name: out;
+				animation-duration: 1.5s;
+				animation-delay: 3s;
+				animation-fill-mode: forwards;
+				z-index: 10;
+			}
+
+			#centertext .sub {
+				font-size: 18px;
+				color: rgba(255,255,255,0.7);
+				letter-spacing: 8px;
+				font-weight: 400;
+				margin-bottom: 8px;
+			}
+
+			#centertext .main {
+				font-size: 52px;
+				color: #fff;
+				font-weight: 900;
+				letter-spacing: 4px;
+				text-shadow: 0 0 60px rgba(99,102,241,0.4);
+			}
+
+			@keyframes out {
+				100% {
+					opacity: 0;
+					display: none;
+				}
+			}
+			@keyframes in {
+				100% {
+					opacity: 1;
+				}
+			}
+
+			#herologo {
+				position: absolute;
+				left: 50%;
+				top: 50%;
+				transform: translate(-50%, -50%);
+				text-align: center;
+				opacity: 0;
+				animation-name: in;
+				animation-duration: 1.5s;
+				animation-delay: 4.5s;
+				animation-iteration-count: 1;
+				animation-fill-mode: forwards;
+				z-index: 5;
+			}
+
+			#herologo .ai-big {
+				font-size: 130px;
+				color: #fff;
+				font-weight: 900;
+				letter-spacing: 0.1em;
+				text-shadow: 0 0 60px rgba(99,102,241,0.4), 0 0 120px rgba(99,102,241,0.2);
+				line-height: 1;
+			}
+
+			#herologo .converter-sub {
+				font-size: 20px;
+				color: rgba(255,255,255,0.7);
+				letter-spacing: 6px;
+				font-weight: 700;
+				margin-top: -8px;
+			}
+
+			#herologo .cn-block {
+				display: inline-block;
+				margin-top: 12px;
+				padding: 6px 24px;
+				background: #fff;
+				color: #1e1b4b;
+				font-size: 22px;
+				font-weight: 900;
+				letter-spacing: 3px;
+				border-radius: 4px;
+				box-shadow: 0 4px 30px rgba(0,0,0,0.2);
+			}
+
+			#enter-btn {
+				position: absolute;
+				left: 50%;
+				bottom: 20%;
+				transform: translateX(-50%);
+				padding: 12px 36px;
+				background: rgba(255,255,255,0.08);
+				border: 1px solid rgba(255,255,255,0.2);
+				border-radius: 9999px;
+				color: rgba(255,255,255,0.9);
+				font-size: 16px;
+				font-weight: 500;
+				letter-spacing: 4px;
+				cursor: pointer;
+				backdrop-filter: blur(8px);
+				opacity: 0;
+				animation-name: in;
+				animation-duration: 1s;
+				animation-delay: 5.5s;
+				animation-fill-mode: forwards;
+				transition: all 0.3s ease;
+				z-index: 10;
+			}
+
+			#enter-btn:hover {
+				background: rgba(255,255,255,0.15);
+				border-color: rgba(255,255,255,0.4);
+				transform: translateX(-50%) scale(1.05);
+				box-shadow: 0 0 30px rgba(99,102,241,0.3);
+			}
+
+			/* 粒子 canvas */
+			#particle-canvas {
+				position: absolute;
+				top: 0; left: 0;
+				width: 100%; height: 100%;
+				pointer-events: none;
+				z-index: 1;
+			}
+		</style>
+	</head>
+	<body>
+		<!-- 蓝色遮罩 + 波浪 -->
+		<div class="startwaves" id="downout">
+			<div class="waves">
+				<img src="img/waves/wave-1.svg" />
+				<img src="img/waves/wave-2.svg" />
+				<img src="img/waves/wave-3.svg" />
+				<img src="img/waves/wave-4.svg" />
+				<img src="img/waves/wave-5.svg" id="shape" />
+			</div>
+		</div>
+
+		<!-- Hero 背景 -->
+		<div id="hero-bg">
+			<canvas id="particle-canvas"></canvas>
+
+			<!-- 遮罩期间显示的文字 -->
+			<div id="centertext">
+				<div class="sub">AI-Script-Converter</div>
+				<div class="main">AI-剧本转换器</div>
+			</div>
+
+			<!-- 遮罩消失后显示的 Logo -->
+			<div id="herologo">
+				<div class="ai-big">AI</div>
+				<div class="converter-sub">AI-Script-Converter</div>
+				<div class="cn-block">AI-剧本转换器</div>
+			</div>
+
+			<!-- 进入按钮 -->
+			<button id="enter-btn">点击进入</button>
+		</div>
+
+		<script>
+			// ===== 遮罩动画结束后隐藏 =====
+			var downwave = document.getElementById('downout');
+			downwave.addEventListener('animationend', function() {
+				downwave.style.display = 'none';
+			});
+
+			// ===== 进入主应用 =====
+			document.getElementById('enter-btn').addEventListener('click', function() {
+				document.body.style.transition = 'opacity 0.5s ease';
+				document.body.style.opacity = '0';
+				setTimeout(function() {
+					localStorage.setItem('hasVisitedWelcome', '1');
+					window.location.href = '/';
+				}, 500);
+			});
+
+			// ===== 粒子效果 =====
+			(function() {
+				var canvas = document.getElementById('particle-canvas');
+				var ctx = canvas.getContext('2d');
+
+				function resize() {
+					canvas.width = window.innerWidth;
+					canvas.height = window.innerHeight;
+				}
+				resize();
+				window.addEventListener('resize', resize);
+
+				var chars = ['第', '章', '幕', '场', '景', 'YAML', ':', '#', '{', '}', 'INT', 'EXT', 'scene', 'dialogue', 'action'];
+				var particles = [];
+
+				for (var i = 0; i < 50; i++) {
+					particles.push({
+						x: Math.random() * canvas.width,
+						y: Math.random() * canvas.height,
+						vx: (Math.random() - 0.5) * 0.3,
+						vy: -Math.random() * 0.3 - 0.1,
+						text: chars[Math.floor(Math.random() * chars.length)],
+						size: Math.random() * 12 + 10,
+						opacity: Math.random() * 0.15 + 0.03,
+						rotation: Math.random() * Math.PI * 2,
+						rotSpeed: (Math.random() - 0.5) * 0.003
+					});
+				}
+
+				function draw() {
+					ctx.clearRect(0, 0, canvas.width, canvas.height);
+					for (var i = 0; i < particles.length; i++) {
+						var p = particles[i];
+						p.x += p.vx;
+						p.y += p.vy;
+						p.rotation += p.rotSpeed;
+
+						if (p.y < -30) {
+							p.y = canvas.height + 30;
+							p.x = Math.random() * canvas.width;
+						}
+
+						ctx.save();
+						ctx.translate(p.x, p.y);
+						ctx.rotate(p.rotation);
+						ctx.font = p.size + 'px sans-serif';
+						ctx.fillStyle = 'rgba(255,255,255,' + p.opacity + ')';
+						ctx.textAlign = 'center';
+						ctx.fillText(p.text, 0, 0);
+						ctx.restore();
+					}
+					requestAnimationFrame(draw);
+				}
+				draw();
+			})();
+		</script>
+	</body>
+</html>

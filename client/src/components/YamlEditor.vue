@@ -61,16 +61,44 @@ onBeforeUnmount(() => {
   editor.value?.dispose()
 })
 
+let highlightDecoration: string[] = []
+
 function goToLine(line: number) {
   if (!editor.value) return
   editor.value.revealLineInCenter(line)
   editor.value.setPosition({ lineNumber: line, column: 1 })
   editor.value.focus()
+  highlightLine(line)
 }
 
-defineExpose({ goToLine })
+function highlightLine(line: number) {
+  if (!editor.value) return
+  highlightDecoration = editor.value.deltaDecorations(highlightDecoration, [
+    {
+      range: new monaco.Range(line, 1, line, 1),
+      options: {
+        isWholeLine: true,
+        className: 'yaml-highlight-line',
+      },
+    },
+  ])
+  setTimeout(() => {
+    if (editor.value) {
+      highlightDecoration = editor.value.deltaDecorations(highlightDecoration, [])
+    }
+  }, 2000)
+}
+
+defineExpose({ goToLine, highlightLine })
 </script>
 
 <template>
   <div ref="containerRef" class="w-full h-full min-h-[400px]" />
 </template>
+
+<style>
+.yaml-highlight-line {
+  background-color: #fef9c3;
+  transition: background-color 0.3s ease;
+}
+</style>

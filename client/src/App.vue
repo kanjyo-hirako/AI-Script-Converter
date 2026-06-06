@@ -77,6 +77,8 @@ const steps = [
           v-else
           :yaml-content="yamlContent"
           :status="conversion.status.value"
+          :characters="conversion.result.value.characters"
+          :scenes="conversion.result.value.scenes"
         />
       </div>
     </main>

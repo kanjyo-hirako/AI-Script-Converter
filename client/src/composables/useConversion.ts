@@ -18,13 +18,35 @@ export function useConversion() {
   const status = ref<ConversionStatus>('idle')
   const progress = ref({ current: 0, total: 0 })
   const errorMessage = ref('')
+  const errorCode = ref<string>('')
   const result = ref<ConversionResult>({ characters: [], locations: [], scenes: [] })
   const chapters = ref<Chapter[]>([])
+
+  async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs = 120000): Promise<Response> {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), timeoutMs)
+    try {
+      return await fetch(url, { ...options, signal: controller.signal })
+    } finally {
+      clearTimeout(timer)
+    }
+  }
+
+  function classifyError(err: any): { message: string; code: string } {
+    if (err.name === 'AbortError') {
+      return { message: '请求超时（2分钟），文本可能过长，请尝试缩短章节', code: 'timeout' }
+    }
+    if (err.message?.includes('Failed to fetch') || err.message?.includes('NetworkError')) {
+      return { message: '网络连接失败，请检查后端服务是否启动', code: 'network' }
+    }
+    return { message: err.message || '未知错误', code: 'unknown' }
+  }
 
   async function convert(novelText: string) {
     chapters.value = splitChapters(novelText)
     if (chapters.value.length === 0) {
       errorMessage.value = '没有识别到任何章节'
+      errorCode.value = 'no_chapters'
       status.value = 'error'
       return
     }
@@ -32,13 +54,14 @@ export function useConversion() {
     status.value = 'converting'
     progress.value = { current: 0, total: chapters.value.length }
     errorMessage.value = ''
+    errorCode.value = ''
     result.value = { characters: [], locations: [], scenes: [] }
 
     for (let i = 0; i < chapters.value.length; i++) {
       progress.value.current = i + 1
 
       try {
-        const res = await fetch('/api/convert', {
+        const res = await fetchWithTimeout('/api/convert', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -62,7 +85,9 @@ export function useConversion() {
         if (data.locations) result.value.locations.push(...data.locations)
         if (data.scenes) result.value.scenes.push(...data.scenes)
       } catch (err: any) {
-        errorMessage.value = `第 ${i + 1} 章转换失败: ${err.message}`
+        const { message, code } = classifyError(err)
+        errorMessage.value = `第 ${i + 1} 章转换失败: ${message}`
+        errorCode.value = code
         status.value = 'error'
         return
       }
@@ -71,10 +96,15 @@ export function useConversion() {
     status.value = 'done'
   }
 
+  function retry(novelText: string) {
+    convert(novelText)
+  }
+
   function reset() {
     status.value = 'idle'
     progress.value = { current: 0, total: 0 }
     errorMessage.value = ''
+    errorCode.value = ''
     result.value = { characters: [], locations: [], scenes: [] }
   }
 
@@ -82,9 +112,11 @@ export function useConversion() {
     status,
     progress,
     errorMessage,
+    errorCode,
     result,
     chapters,
     convert,
+    retry,
     reset,
   }
 }

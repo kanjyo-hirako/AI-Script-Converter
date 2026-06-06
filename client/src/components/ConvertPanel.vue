@@ -7,16 +7,35 @@ const props = defineProps<{
   status: 'idle' | 'converting' | 'done' | 'error'
   progress: { current: number; total: number }
   errorMessage: string
+  errorCode: string
 }>()
 
 const emit = defineEmits<{
   convert: []
+  retry: []
   reset: []
 }>()
 
 const { isComplete } = useSettings()
 
 const canConvert = computed(() => props.text.trim().length > 0 && isComplete())
+
+const isRetryable = computed(() =>
+  ['timeout', 'network', 'unknown'].includes(props.errorCode)
+)
+
+const errorHint = computed(() => {
+  switch (props.errorCode) {
+    case 'timeout':
+      return '可以点击重试再次尝试，或缩短章节文本后重试'
+    case 'network':
+      return '请确认后端服务已启动（npm run dev:server）'
+    case 'no_chapters':
+      return '请确认文本中包含"第X章"格式的章节标题'
+    default:
+      return ''
+  }
+})
 </script>
 
 <template>
@@ -63,14 +82,29 @@ const canConvert = computed(() => props.text.trim().length > 0 && isComplete())
         </button>
       </div>
 
-      <div v-else-if="status === 'error'" class="text-center space-y-4">
-        <p class="text-red-600">{{ errorMessage }}</p>
-        <button
-          class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors"
-          @click="emit('reset')"
-        >
-          重试
-        </button>
+      <div v-else-if="status === 'error'" class="text-center space-y-3">
+        <div class="inline-flex items-center gap-2 text-red-600">
+          <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
+          <span>{{ errorMessage }}</span>
+        </div>
+        <p v-if="errorHint" class="text-sm text-gray-500">{{ errorHint }}</p>
+        <div class="flex justify-center gap-3">
+          <button
+            v-if="isRetryable"
+            class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700 transition-colors"
+            @click="emit('retry')"
+          >
+            重试
+          </button>
+          <button
+            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors"
+            @click="emit('reset')"
+          >
+            重新开始
+          </button>
+        </div>
       </div>
     </template>
   </div>

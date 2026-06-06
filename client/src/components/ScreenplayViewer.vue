@@ -69,10 +69,11 @@ function handleExport() {
           导出 .yaml
         </button>
       </div>
-      <div class="flex-1 flex gap-3 min-h-0">
-        <!-- 左侧：角色面板 -->
-        <aside class="w-56 shrink-0 border border-gray-200 rounded-lg overflow-y-auto">
-          <div class="px-3 py-2 border-b border-gray-100">
+      <!-- 桌面端三栏布局，移动端堆叠 -->
+      <div class="flex-1 flex flex-col lg:flex-row gap-3 min-h-0">
+        <!-- 左侧：角色面板（桌面端侧边栏，移动端可折叠） -->
+        <aside class="lg:w-56 shrink-0 border border-gray-200 rounded-lg overflow-y-auto max-h-48 lg:max-h-none">
+          <div class="px-3 py-2 border-b border-gray-100 sticky top-0 bg-white">
             <h3 class="text-sm font-semibold text-gray-700">角色 ({{ characters.length }})</h3>
           </div>
           <div class="p-1">
@@ -81,13 +82,13 @@ function handleExport() {
         </aside>
 
         <!-- 中间：YAML 编辑器 -->
-        <div class="flex-1 border border-gray-200 rounded-lg overflow-hidden min-w-0">
+        <div class="flex-1 border border-gray-200 rounded-lg overflow-hidden min-w-0 min-h-[300px] lg:min-h-0">
           <YamlEditor ref="editorRef" :model-value="yamlContent" :read-only="readOnly" />
         </div>
 
-        <!-- 右侧：场景导航 -->
-        <aside class="w-60 shrink-0 border border-gray-200 rounded-lg overflow-y-auto">
-          <div class="px-3 py-2 border-b border-gray-100">
+        <!-- 右侧：场景导航（桌面端侧边栏，移动端可折叠） -->
+        <aside class="lg:w-60 shrink-0 border border-gray-200 rounded-lg overflow-y-auto max-h-48 lg:max-h-none">
+          <div class="px-3 py-2 border-b border-gray-100 sticky top-0 bg-white">
             <h3 class="text-sm font-semibold text-gray-700">场景</h3>
           </div>
           <div class="p-1">

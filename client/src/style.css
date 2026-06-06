@@ -1,1 +1,21 @@
 @import "tailwindcss";
+
+/* 全局平滑滚动 */
+html {
+  scroll-behavior: smooth;
+}
+
+/* 文本域聚焦时的过渡效果 */
+textarea:focus,
+input:focus,
+select:focus {
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+/* 限制行数工具类 */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

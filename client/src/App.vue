@@ -1,12 +1,31 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import * as YAML from 'yaml'
 import SettingsPanel from './components/SettingsPanel.vue'
 import NovelInput from './components/NovelInput.vue'
 import ChapterSplitter from './components/ChapterSplitter.vue'
 import ConvertPanel from './components/ConvertPanel.vue'
+import ScreenplayViewer from './components/ScreenplayViewer.vue'
+import { useConversion } from './composables/useConversion'
 
 const currentStep = ref<'settings' | 'input' | 'split' | 'convert' | 'edit'>('settings')
 const novelText = ref('')
+
+const conversion = useConversion()
+
+const yamlContent = computed(() => {
+  if (conversion.status.value !== 'done') return ''
+  return YAML.stringify(
+    {
+      screenplay: {
+        characters: conversion.result.value.characters,
+        locations: conversion.result.value.locations,
+        scenes: conversion.result.value.scenes,
+      },
+    },
+    { indent: 2 }
+  )
+})
 
 const steps = [
   { key: 'settings', label: '设置' },
@@ -45,10 +64,20 @@ const steps = [
         <SettingsPanel v-if="currentStep === 'settings'" />
         <NovelInput v-else-if="currentStep === 'input'" @update:text="novelText = $event" />
         <ChapterSplitter v-else-if="currentStep === 'split'" :text="novelText" />
-        <ConvertPanel v-else-if="currentStep === 'convert'" :text="novelText" />
-        <div v-else class="text-gray-500">
-          <p>「{{ steps.find(s => s.key === currentStep)?.label }}」步骤待实现</p>
-        </div>
+        <ConvertPanel
+          v-else-if="currentStep === 'convert'"
+          :text="novelText"
+          :status="conversion.status.value"
+          :progress="conversion.progress.value"
+          :error-message="conversion.errorMessage.value"
+          @convert="conversion.convert(novelText)"
+          @reset="conversion.reset()"
+        />
+        <ScreenplayViewer
+          v-else
+          :yaml-content="yamlContent"
+          :status="conversion.status.value"
+        />
       </div>
     </main>
   </div>

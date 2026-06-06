@@ -11,6 +11,11 @@ import { useConversion } from './composables/useConversion'
 const currentStep = ref<'input' | 'split' | 'convert' | 'edit' | 'settings'>('input')
 const novelText = ref('')
 
+// 首次访问跳转欢迎页
+if (!localStorage.getItem('hasVisitedWelcome')) {
+  window.location.href = '/welcome/'
+}
+
 const conversion = useConversion()
 
 const yamlContent = computed(() => {

@@ -11,9 +11,10 @@ import { useConversion } from './composables/useConversion'
 const currentStep = ref<'input' | 'split' | 'convert' | 'edit' | 'settings'>('input')
 const novelText = ref('')
 
-// 首次访问跳转欢迎页
-if (!localStorage.getItem('hasVisitedWelcome')) {
-  window.location.href = '/welcome/'
+// 每次新标签页访问都展示欢迎页
+if (!sessionStorage.getItem('hasSeenWelcome')) {
+  sessionStorage.setItem('hasSeenWelcome', '1')
+  window.location.href = '/welcome/index.html'
 }
 
 const conversion = useConversion()

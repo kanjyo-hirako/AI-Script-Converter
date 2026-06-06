@@ -1,18 +1,22 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useConversion } from '../composables/useConversion'
 import { useSettings } from '../composables/useSettings'
 
-const props = defineProps<{ text: string }>()
+const props = defineProps<{
+  text: string
+  status: 'idle' | 'converting' | 'done' | 'error'
+  progress: { current: number; total: number }
+  errorMessage: string
+}>()
 
-const { status, progress, errorMessage, convert, reset } = useConversion()
+const emit = defineEmits<{
+  convert: []
+  reset: []
+}>()
+
 const { isComplete } = useSettings()
 
 const canConvert = computed(() => props.text.trim().length > 0 && isComplete())
-
-async function handleConvert() {
-  await convert(props.text)
-}
 </script>
 
 <template>
@@ -30,7 +34,7 @@ async function handleConvert() {
         <p class="text-gray-600 mb-4">准备就绪，点击按钮开始生成剧本</p>
         <button
           class="px-6 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
-          @click="handleConvert"
+          @click="emit('convert')"
         >
           生成剧本
         </button>
@@ -53,7 +57,7 @@ async function handleConvert() {
         <p class="text-green-600 font-medium">转换完成！</p>
         <button
           class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors"
-          @click="reset"
+          @click="emit('reset')"
         >
           重新转换
         </button>
@@ -63,7 +67,7 @@ async function handleConvert() {
         <p class="text-red-600">{{ errorMessage }}</p>
         <button
           class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors"
-          @click="reset"
+          @click="emit('reset')"
         >
           重试
         </button>

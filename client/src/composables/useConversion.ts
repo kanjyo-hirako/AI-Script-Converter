@@ -24,10 +24,14 @@ export function useConversion() {
 
   let abortController: AbortController | null = null
   let failedChapterIndex = -1
+  let userCancelled = false
 
   function classifyError(err: any): { message: string; code: string } {
     if (err.name === 'AbortError') {
-      return { message: '已取消转换', code: 'cancelled' }
+      if (userCancelled) {
+        return { message: '已取消转换', code: 'cancelled' }
+      }
+      return { message: '请求超时（2分钟），文本可能过长，请尝试缩短章节', code: 'timeout' }
     }
     if (err.message?.includes('Failed to fetch') || err.message?.includes('NetworkError')) {
       return { message: '网络连接失败，请检查后端服务是否启动', code: 'network' }
@@ -38,6 +42,7 @@ export function useConversion() {
   async function convertChapter(index: number): Promise<boolean> {
     progress.value.current = index + 1
 
+    userCancelled = false
     abortController = new AbortController()
     const timer = setTimeout(() => abortController?.abort(), 120000)
 
@@ -134,6 +139,7 @@ export function useConversion() {
   }
 
   function cancel() {
+    userCancelled = true
     if (abortController) {
       abortController.abort()
     }

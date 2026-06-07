@@ -115,6 +115,7 @@ function stepIndex(key: string) {
           :error-code="conversion.errorCode.value"
           @convert="conversion.convert(novelText)"
           @retry="conversion.retry(novelText)"
+          @cancel="conversion.cancel()"
           @reset="conversion.reset()"
         />
         <ScreenplayViewer

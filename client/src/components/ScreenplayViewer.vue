@@ -148,7 +148,7 @@ function handleImportFile(e: Event) {
 </script>
 
 <template>
-  <div class="h-full flex flex-col">
+  <div class="h-[calc(100vh-220px)] flex flex-col">
     <div v-if="status === 'idle'" class="flex-1 flex items-center justify-center text-gray-400">
       <p>完成「生成」步骤后，剧本 YAML 将在此处显示</p>
     </div>
@@ -163,7 +163,7 @@ function handleImportFile(e: Event) {
     </div>
 
     <template v-else-if="status === 'done'">
-      <div class="flex items-center justify-between mb-3">
+      <div class="flex items-center justify-between mb-3 shrink-0">
         <div class="flex items-center gap-1 bg-gray-100 rounded-lg p-0.5">
           <button
             class="px-3 py-1 text-sm rounded-md transition-colors"
@@ -208,7 +208,7 @@ function handleImportFile(e: Event) {
         </div>
       </div>
       <!-- 桌面端三栏布局，移动端堆叠 -->
-      <div class="flex-1 flex flex-col lg:flex-row gap-3 min-h-0">
+      <div class="flex-1 flex flex-col lg:flex-row gap-3 min-h-0 overflow-hidden">
         <!-- 左侧：角色面板（桌面端侧边栏，移动端可折叠） -->
         <aside class="lg:w-56 shrink-0 border border-gray-200 rounded-lg overflow-y-auto max-h-48 lg:max-h-none">
           <div class="px-3 py-2 border-b border-gray-100 sticky top-0 bg-white">
@@ -220,7 +220,7 @@ function handleImportFile(e: Event) {
         </aside>
 
         <!-- 中间：YAML 编辑器 / 格式化预览 -->
-        <div class="flex-1 border border-gray-200 rounded-lg overflow-hidden min-w-0 min-h-[300px] lg:min-h-0">
+        <div class="flex-1 border border-gray-200 rounded-lg overflow-hidden min-w-0">
           <YamlEditor v-if="viewMode === 'yaml'" ref="editorRef" :model-value="yamlContent" :read-only="readOnly" />
           <FormattedPreview
             v-else

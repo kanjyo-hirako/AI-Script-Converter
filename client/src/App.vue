@@ -8,9 +8,11 @@ import ConvertPanel from './components/ConvertPanel.vue'
 import ScreenplayViewer from './components/ScreenplayViewer.vue'
 import ParticlesBg from './components/ParticlesBg.vue'
 import { useConversion } from './composables/useConversion'
+import type { Chapter } from './lib/chapterSplitter'
 
 const currentStep = ref<'input' | 'split' | 'convert' | 'edit' | 'settings'>('input')
 const novelText = ref('')
+const selectedChapters = ref<Chapter[]>([])
 
 // 每次新标签页访问都展示欢迎页
 if (!sessionStorage.getItem('hasSeenWelcome')) {
@@ -105,7 +107,7 @@ function stepIndex(key: string) {
       <!-- 主内容区 -->
       <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-6">
         <NovelInput v-if="currentStep === 'input'" @update:text="novelText = $event" />
-        <ChapterSplitter v-else-if="currentStep === 'split'" :text="novelText" />
+        <ChapterSplitter v-else-if="currentStep === 'split'" :text="novelText" @update:chapters="selectedChapters = $event" />
         <ConvertPanel
           v-else-if="currentStep === 'convert'"
           :text="novelText"
@@ -113,7 +115,7 @@ function stepIndex(key: string) {
           :progress="conversion.progress.value"
           :error-message="conversion.errorMessage.value"
           :error-code="conversion.errorCode.value"
-          @convert="conversion.convert(novelText)"
+          @convert="conversion.convert(novelText, selectedChapters)"
           @retry="conversion.retry(novelText)"
           @cancel="conversion.cancel()"
           @reset="conversion.reset()"

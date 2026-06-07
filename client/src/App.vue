@@ -6,6 +6,7 @@ import NovelInput from './components/NovelInput.vue'
 import ChapterSplitter from './components/ChapterSplitter.vue'
 import ConvertPanel from './components/ConvertPanel.vue'
 import ScreenplayViewer from './components/ScreenplayViewer.vue'
+import ParticlesBg from './components/ParticlesBg.vue'
 import { useConversion } from './composables/useConversion'
 
 const currentStep = ref<'input' | 'split' | 'convert' | 'edit' | 'settings'>('input')
@@ -47,18 +48,24 @@ function stepIndex(key: string) {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50 text-gray-800">
-    <!-- 顶部渐变装饰条 -->
-    <div class="h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
-
-    <header class="bg-white border-b border-gray-200 px-6 py-5">
+  <div class="relative min-h-screen text-gray-800">
+    <!-- 粒子背景 -->
+    <ParticlesBg
+      class="fixed inset-0 z-0"
+      :quantity="900"
+      :ease="80"
+      :staticity="20"
+      color="#60a5fa"
+      refresh
+    />
+    <header class="relative z-10 bg-white/80 backdrop-blur-sm border-b border-gray-200 px-6 py-5">
       <div class="max-w-7xl mx-auto">
         <h1 class="text-xl font-bold text-gray-900">AI 小说转剧本工具</h1>
         <p class="text-sm text-gray-500 mt-1">将中文小说自动转换为结构化 YAML 剧本</p>
       </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+    <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
       <!-- 步骤导航 -->
       <nav class="flex items-center gap-1 sm:gap-2 mb-6 sm:mb-8 overflow-x-auto pb-2">
         <template v-for="(step, i) in steps" :key="step.key">

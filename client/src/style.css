@@ -4,6 +4,11 @@
 /* 全局平滑滚动 */
 html {
   scroll-behavior: smooth;
+  background: #f9fafb;
+}
+
+body {
+  background: transparent;
 }
 
 /* 文本域聚焦时的过渡效果 */

@@ -9,7 +9,7 @@ import type { Character, Location, Scene } from '../../../shared/types'
 
 const props = defineProps<{
   yamlContent: string
-  status: 'idle' | 'converting' | 'done' | 'error'
+  status: 'idle' | 'converting' | 'done' | 'error' | 'cancelled'
   characters: Character[]
   locations: Location[]
   scenes: Scene[]

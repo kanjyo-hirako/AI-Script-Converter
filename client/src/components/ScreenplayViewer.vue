@@ -4,6 +4,7 @@ import * as YAML from 'yaml'
 import YamlEditor from './YamlEditor.vue'
 import CharacterPanel from './CharacterPanel.vue'
 import SceneNavigator from './SceneNavigator.vue'
+import FormattedPreview from './FormattedPreview.vue'
 import { toFountain } from '../lib/fountainExporter'
 import type { Character, Location, Scene } from '../../../shared/types'
 
@@ -23,6 +24,7 @@ const readOnly = computed(() => props.status === 'converting')
 const editorRef = ref<InstanceType<typeof YamlEditor>>()
 const importInputRef = ref<HTMLInputElement>()
 const showExportMenu = ref(false)
+const viewMode = ref<'yaml' | 'formatted'>('yaml')
 
 function findLineById(id: string): number {
   const lines = props.yamlContent.split('\n')
@@ -162,7 +164,22 @@ function handleImportFile(e: Event) {
 
     <template v-else-if="status === 'done'">
       <div class="flex items-center justify-between mb-3">
-        <span class="text-sm text-gray-500">剧本 YAML 编辑器</span>
+        <div class="flex items-center gap-1 bg-gray-100 rounded-lg p-0.5">
+          <button
+            class="px-3 py-1 text-sm rounded-md transition-colors"
+            :class="viewMode === 'yaml' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+            @click="viewMode = 'yaml'"
+          >
+            YAML 编辑器
+          </button>
+          <button
+            class="px-3 py-1 text-sm rounded-md transition-colors"
+            :class="viewMode === 'formatted' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+            @click="viewMode = 'formatted'"
+          >
+            格式化预览
+          </button>
+        </div>
         <div class="flex items-center gap-2">
           <button
             class="px-3 py-1.5 bg-white text-gray-600 text-sm rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
@@ -202,9 +219,16 @@ function handleImportFile(e: Event) {
           </div>
         </aside>
 
-        <!-- 中间：YAML 编辑器 -->
+        <!-- 中间：YAML 编辑器 / 格式化预览 -->
         <div class="flex-1 border border-gray-200 rounded-lg overflow-hidden min-w-0 min-h-[300px] lg:min-h-0">
-          <YamlEditor ref="editorRef" :model-value="yamlContent" :read-only="readOnly" />
+          <YamlEditor v-if="viewMode === 'yaml'" ref="editorRef" :model-value="yamlContent" :read-only="readOnly" />
+          <FormattedPreview
+            v-else
+            :characters="characters"
+            :locations="locations"
+            :scenes="scenes"
+            class="h-full overflow-y-auto"
+          />
         </div>
 
         <!-- 右侧：场景导航（桌面端侧边栏，移动端可折叠） -->

@@ -122,7 +122,9 @@ function stepIndex(key: string) {
           :yaml-content="yamlContent"
           :status="conversion.status.value"
           :characters="conversion.result.value.characters"
+          :locations="conversion.result.value.locations"
           :scenes="conversion.result.value.scenes"
+          @import-yaml="conversion.loadResult($event)"
         />
         <SettingsPanel v-else />
       </div>

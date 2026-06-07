@@ -108,6 +108,18 @@ export function useConversion() {
     result.value = { characters: [], locations: [], scenes: [] }
   }
 
+  function loadResult(data: ConversionResult) {
+    result.value = {
+      characters: data.characters || [],
+      locations: data.locations || [],
+      scenes: data.scenes || [],
+    }
+    status.value = 'done'
+    progress.value = { current: 0, total: 0 }
+    errorMessage.value = ''
+    errorCode.value = ''
+  }
+
   return {
     status,
     progress,
@@ -118,5 +130,6 @@ export function useConversion() {
     convert,
     retry,
     reset,
+    loadResult,
   }
 }

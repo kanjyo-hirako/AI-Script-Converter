@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useSettings } from '../composables/useSettings'
+import SettingsModal from './SettingsModal.vue'
 
 const props = defineProps<{
   text: string
@@ -17,8 +18,7 @@ const emit = defineEmits<{
 }>()
 
 const { isComplete } = useSettings()
-
-const canConvert = computed(() => props.text.trim().length > 0 && isComplete())
+const showSettingsModal = ref(false)
 
 const isRetryable = computed(() =>
   ['timeout', 'network', 'unknown'].includes(props.errorCode)
@@ -36,6 +36,18 @@ const errorHint = computed(() => {
       return ''
   }
 })
+
+function handleConvertClick() {
+  if (!isComplete()) {
+    showSettingsModal.value = true
+    return
+  }
+  emit('convert')
+}
+
+function onSettingsSaved() {
+  emit('convert')
+}
 </script>
 
 <template>
@@ -44,16 +56,21 @@ const errorHint = computed(() => {
       请先在「输入」步骤中粘贴或上传小说文本
     </div>
 
-    <div v-else-if="!isComplete()" class="text-amber-600 text-sm">
-      请先在「设置」步骤中填写 API Key 和选择模型
-    </div>
-
     <template v-else>
       <div v-if="status === 'idle'" class="text-center">
+        <div
+          v-if="!isComplete()"
+          class="inline-flex items-center gap-2 px-4 py-2 mb-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-sm"
+        >
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
+          <span>尚未配置 API Key，点击生成后可快速配置</span>
+        </div>
         <p class="text-gray-600 mb-4">准备就绪，点击按钮开始生成剧本</p>
         <button
           class="px-6 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
-          @click="emit('convert')"
+          @click="handleConvertClick"
         >
           生成剧本
         </button>
@@ -107,5 +124,11 @@ const errorHint = computed(() => {
         </div>
       </div>
     </template>
+
+    <SettingsModal
+      :visible="showSettingsModal"
+      @close="showSettingsModal = false"
+      @saved="onSettingsSaved"
+    />
   </div>
 </template>

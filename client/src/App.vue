@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import * as YAML from 'yaml'
 import SettingsPanel from './components/SettingsPanel.vue'
 import NovelInput from './components/NovelInput.vue'
@@ -21,6 +21,11 @@ if (!sessionStorage.getItem('hasSeenWelcome')) {
 }
 
 const conversion = useConversion()
+
+// 生成完成后自动跳转到编辑步骤
+watch(() => conversion.status.value, (s) => {
+  if (s === 'done') currentStep.value = 'edit'
+})
 
 const yamlContent = computed(() => {
   if (conversion.status.value !== 'done') return ''

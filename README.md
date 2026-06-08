@@ -1,6 +1,6 @@
 # AI-Script-Converter
 
-> **AI 小说转剧本工具** — 将中文小说自动转换为结构化 YAML 剧本<br/>视频放在了https://www.bilibili.com/video/BV1w4Et6PEX7/?vd_source=011d6d3e114c910e814e18d028fb90d3访问即可
+> **AI 小说转剧本工具** — 将中文小说自动转换为结构化 YAML 剧本
 
 <p align="center">
   <img src="https://img.shields.io/badge/Vue-3.5-4FC08D?logo=vue.js&logoColor=white" alt="Vue 3" />
@@ -9,6 +9,9 @@
   <img src="https://img.shields.io/badge/Vite-6.7-646CFF?logo=vite&logoColor=white" alt="Vite" />
   <img src="https://img.shields.io/badge/Express-4.21-000000?logo=express&logoColor=white" alt="Express" />
   <img src="https://img.shields.io/badge/OpenAI_SDK-Compatible-412991?logo=openai&logoColor=white" alt="OpenAI SDK" />
+  <a href="https://www.bilibili.com/video/BV1w4Et6PEX7/?vd_source=011d6d3e114c910e814e18d028fb90d3">
+    <img src="https://img.shields.io/badge/Bilibili-video_TBD-FB7299?logo=bilibili&logoColor=white" alt="Bilibili" />
+  </a>
 </p>
 
 ---

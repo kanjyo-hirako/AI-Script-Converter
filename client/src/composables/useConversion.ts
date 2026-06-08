@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { useSettings } from './useSettings'
-import { splitChapters } from '../lib/chapterSplitter'
+import { splitChapters, expandChapters } from '../lib/chapterSplitter'
 import type { Character, Location, Scene } from '../../../shared/types'
 import type { Chapter } from '../lib/chapterSplitter'
 
@@ -93,9 +93,9 @@ export function useConversion() {
 
   async function convert(novelText: string, selectedChapters?: Chapter[]) {
     if (selectedChapters && selectedChapters.length > 0) {
-      chapters.value = selectedChapters.filter(ch => ch.selected !== false)
+      chapters.value = expandChapters(selectedChapters.filter(ch => ch.selected !== false))
     } else {
-      chapters.value = splitChapters(novelText).filter(ch => ch.selected !== false)
+      chapters.value = expandChapters(splitChapters(novelText).filter(ch => ch.selected !== false))
     }
     if (chapters.value.length === 0) {
       errorMessage.value = '没有选择任何章节'

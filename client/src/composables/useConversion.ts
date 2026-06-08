@@ -67,8 +67,27 @@ export function useConversion() {
       }
 
       const data = await res.json()
-      if (data.characters) result.value.characters.push(...data.characters)
-      if (data.locations) result.value.locations.push(...data.locations)
+
+      const existingCharNames = new Set(result.value.characters.map(c => c.name))
+      if (data.characters) {
+        for (const char of data.characters) {
+          if (!existingCharNames.has(char.name)) {
+            existingCharNames.add(char.name)
+            result.value.characters.push(char)
+          }
+        }
+      }
+
+      const existingLocNames = new Set(result.value.locations.map(l => l.name))
+      if (data.locations) {
+        for (const loc of data.locations) {
+          if (!existingLocNames.has(loc.name)) {
+            existingLocNames.add(loc.name)
+            result.value.locations.push(loc)
+          }
+        }
+      }
+
       if (data.scenes) result.value.scenes.push(...data.scenes)
 
       return true

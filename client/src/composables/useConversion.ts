@@ -43,8 +43,9 @@ export function useConversion() {
     progress.value.current = index + 1
 
     userCancelled = false
-    abortController = new AbortController()
-    const timer = setTimeout(() => abortController?.abort(), 120000)
+    const controller = new AbortController()
+    abortController = controller
+    const timer = setTimeout(() => controller.abort(), 120000)
 
     try {
       const res = await fetch('/api/convert', {
@@ -58,7 +59,7 @@ export function useConversion() {
           existingCharacters: result.value.characters,
           existingScenes: result.value.scenes,
         }),
-        signal: abortController.signal,
+        signal: controller.signal,
       })
 
       if (!res.ok) {
@@ -106,7 +107,7 @@ export function useConversion() {
       return false
     } finally {
       clearTimeout(timer)
-      abortController = null
+      if (abortController === controller) abortController = null
     }
   }
 

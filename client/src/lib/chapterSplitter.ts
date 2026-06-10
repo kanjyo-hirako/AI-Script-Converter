@@ -79,6 +79,10 @@ export function splitChapters(text: string, customPattern?: string): Chapter[] {
   let match: RegExpExecArray | null
 
   while ((match = regex.exec(text)) !== null) {
+    if (match[0].length === 0) {
+      regex.lastIndex++
+      continue
+    }
     matches.push({
       title: match[0].trim(),
       index: match.index,

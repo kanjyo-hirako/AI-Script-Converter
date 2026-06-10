@@ -35,7 +35,7 @@ function splitLongChapter(content: string, maxLength = MAX_CHUNK_LENGTH): string
   }
 
   if (remaining) chunks.push(remaining)
-  return chunks
+  return chunks.filter(c => c.length > 0)
 }
 
 export function expandChapters(chapters: Chapter[]): Chapter[] {

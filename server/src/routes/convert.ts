@@ -21,6 +21,16 @@ router.post('/convert', async (req, res) => {
       return;
     }
 
+    if (typeof apiKey !== 'string' || typeof baseURL !== 'string' ||
+        typeof model !== 'string' || typeof chapterText !== 'string') {
+      res.status(400).json({ error: '参数类型错误，apiKey/baseURL/model/chapterText 必须为字符串' });
+      return;
+    }
+    if (!Array.isArray(existingCharacters) || !Array.isArray(existingScenes)) {
+      res.status(400).json({ error: 'existingCharacters/existingScenes 必须为数组' });
+      return;
+    }
+
     const client = createAIClient(apiKey, baseURL);
     const systemPrompt = buildSystemPrompt();
     const userPrompt = buildUserPrompt(chapterText, existingCharacters, existingScenes);

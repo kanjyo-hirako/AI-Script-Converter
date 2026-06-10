@@ -19,7 +19,8 @@ export function toFountain(
     // Scene heading
     const location = locationMap.get(scene.location_id)
     const locationName = location?.name || scene.location_id
-    lines.push(`#. ${scene.heading || `${scene.time_of_day === '夜晚' ? 'INT' : 'INT'}. ${locationName} - ${scene.time_of_day}`}`)
+    const locType = location?.type || 'INT'
+    lines.push(`#. ${scene.heading || `${locType}. ${locationName} - ${scene.time_of_day}`}`)
     lines.push('')
 
     for (const item of scene.content) {
